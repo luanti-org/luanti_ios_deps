@@ -1,0 +1,30 @@
+# Build arguments go here.
+# See "gn args <out_dir> --list" for available build arguments.
+target_os = "ios"
+target_cpu = "arm64"
+target_environment = "simulator"
+mac_sdk_min = "15.1"
+mac_sdk_version = "15.1"
+ios_sdk_version = "15.1"
+dcheck_always_on = true
+enable_run_ios_unittests_with_xctest = true
+is_component_build = false
+is_debug = false
+symbol_level = 1
+angle_build_tests = false
+angle_enable_wgpu = false
+angle_enable_vulkan = false
+angle_enable_d3d9 = false
+angle_enable_d3d11 = false
+angle_enable_gl = false
+angle_enable_null = false
+angle_enable_essl = false
+angle_enable_spirv = false
+angle_enable_swiftshader = false
+angle_enable_warp = false
+angle_enable_metal = true
+is_component_build = false
+angle_static_library = true
+complete_static_lib = true
+use_custom_libcxx = false
+

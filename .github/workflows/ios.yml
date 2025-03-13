@@ -1,0 +1,43 @@
+name: ios_deps
+
+on:
+  push:
+    paths:
+      - '**.sh'
+      - 'data/**'
+      - '.github/workflows/ios.yml'
+  pull_request:
+    paths:
+      - '**.sh'
+      - 'data/**'
+      - '.github/workflows/ios.yml'
+
+jobs:
+  build-arm-macos-xcode:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build deps iPhone
+        run: |
+          ./build.sh iphone_deps iPhoneOS 18.2
+          ./build_angle.sh iphone_deps iPhoneOS 18.2
+
+      - name: Build deps iPhoneSimulator
+        run: |
+          ./build.sh iphonesimulator_deps iPhoneSimulator 18.2
+          ./build_angle.sh iphonesimulator_deps iPhoneSimulator 18.2
+
+      - name: Build deps iPhoneSimulator
+        run: |
+          mkdir deps
+          mv iphone_deps/install deps/iphone
+          mv iphonesimulator_deps/install deps/iphonesimulator
+          tar -czvf deps.tar.gz deps
+
+      - name: Upload deps
+        if: github.event_name == 'push' && github.ref == 'ref/heads/master'
+        uses: actions/upload-artifact@v3
+        with:
+          name: deps
+          path: deps.tar.gz
