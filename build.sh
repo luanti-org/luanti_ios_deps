@@ -38,6 +38,6 @@ download_ios_deps $arch $osver
 
 untar_ios_deps $arch $osver
 
-compile_ios_deps $arch $osver $xcodever "$SCRIPT_DIR/data"
+compile_ios_deps $arch $osver "$xcodever" "$SCRIPT_DIR/data"
 
 cd $RUN_DIR

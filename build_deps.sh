@@ -257,8 +257,6 @@ compile_ios_deps() {
 					-DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_DEPLOYMENT_TARGET=$osver \
 					-DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_OSX_SYSROOT=$target_sysroot \
 					-DSDL_OPENGL=0 -DSDL_OPENGLES=0 \
-					-DCMAKE_EXE_LINKER_FLAGS="/Users/sfence/Desktop/minetest/angle/libGLESv2.a" \
-					-DCMAKE_C_FLAGS="-I/Users/sfence/Desktop/minetest/angle/include" \
 					-DCMAKE_INSTALL_NAME_DIR=$dir/install/lib
 	echo "Building SDL2..."
 	make -j$(sysctl -n hw.logicalcpu)
