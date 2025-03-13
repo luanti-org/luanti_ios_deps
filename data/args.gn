@@ -6,6 +6,7 @@ target_environment = "simulator"
 mac_sdk_min = "15.1"
 mac_sdk_version = "15.1"
 ios_sdk_version = "15.1"
+ios_enable_code_signing = false
 dcheck_always_on = true
 enable_run_ios_unittests_with_xctest = true
 is_component_build = false
