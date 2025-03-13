@@ -60,15 +60,20 @@ check_ios_file() {
 compile_ios_deps() {
 	arch=$1
 	osver=$2
-	datadir=$3
+	xcodever=$3
+	datadir=$4
 	
 	# setup environment
-	target_sysroot="/Applications/Xcode.app/Contents/Developer/Platforms/${arch}.platform/Developer/SDKs/${arch}${osver}.sdk"
+	xcodeapp="Xcode.app"
+	if [[ -n $xcodever ]]; then
+		xcodeapp="Xcode_$xcodever.app"
+	fi
+	target_sysroot="/Applications/$xcodeapp/Contents/Developer/Platforms/${arch}.platform/Developer/SDKs/${arch}${osver}.sdk"
 	if [ ! -d "$target_sysroot" ]; then
 		echo "Requested target sysroot SDK does not found ${arch}${osver}.sdk"
 		exit 1
 	fi
-	host_sysroot="/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk"
+	host_sysroot="/Applications/$xcodeapp/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk"
 	if [ ! -d "$host_sysroot" ]; then
 		echo "Requested host sysroot SDK does not found MacOSX.sdk"
 		exit 1

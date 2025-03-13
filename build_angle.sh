@@ -2,10 +2,11 @@
 
 echo "This is script automate Google ANGLE build for iOS."
 
-if [[ $# -ne 3 ]] ; then
-	echo "Usage: build_angle.sh where_angle arch osver"
+if [[ $# -ne 4 ]] ; then
+	echo "Usage: build_angle.sh where_angle arch osver xcodever"
 	echo "  arch - iPhoneOS, iPhoneSimulator"
 	echo "  osver  - 18.2 etc."
+	echo "	xcodever - 16.2 etc"
 	exit 1
 fi
 
@@ -15,6 +16,7 @@ SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
 where_angle=$1
 arch=$2
 osver=$3
+xcodever=$4
 
 install_angle=$where_angle/install
 
