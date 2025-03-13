@@ -78,6 +78,7 @@ compile_ios_deps() {
 		echo "Requested host sysroot SDK does not found MacOSX.sdk"
 		exit 1
 	fi
+	sudo xcode-select -s /Applications/$xcodeapp/Contents/Developer
 
 	mkdir -p install
 

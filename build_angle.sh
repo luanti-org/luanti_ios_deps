@@ -38,6 +38,12 @@ git -C angle checkout $angle_hash
 
 export PATH=$PWD/depot_tools:$PATH
 
+xcodeapp="Xcode.app"
+if [[ -n $xcodever ]]; then
+	xcodeapp="Xcode_$xcodever.app"
+fi
+sudo xcode-select -s /Applications/$xcodeapp/Contents/Developer
+
 # angle
 cd angle
 echo "Configuring angle..."
