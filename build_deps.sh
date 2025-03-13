@@ -14,8 +14,6 @@ download_ios_deps() {
 	arch=$1
 	osver=$2
 
-	brew install cmake nasm wget m4 autoconf automake libtool
-
 	echo "Downloading sources..."
 	download_ios_archive gettext.tar.gz https://ftp.gnu.org/gnu/gettext/gettext-0.22.5.tar.gz ec1705b1e969b83a9f073144ec806151db88127f5e40fe5a94cb6c8fa48996a0
 	download_ios_archive freetype.tar.xz https://downloads.sourceforge.net/project/freetype/freetype2/2.13.3/freetype-2.13.3.tar.xz 0550350666d427c74daeb85d5ac7bb353acba5f76956395995311a9c6f063289

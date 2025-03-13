@@ -18,26 +18,35 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Instal Brew packages
+        run: |
+          brew install cmake nasm wget m4 autoconf automake libtool
+
       - name: Build deps iPhone
         run: |
           ./build.sh iphone_deps iPhoneOS 18.2 16.2
+
+      - name: Build ANGLE for iPhone
+        run: |
           ./build_angle.sh iphone_deps iPhoneOS 18.2 16.2
 
       - name: Build deps iPhoneSimulator
         run: |
           ./build.sh iphonesimulator_deps iPhoneSimulator 18.2 16.2
+
+      - name: Build ANGLE for iPhoneSimulator
+        run: |
           ./build_angle.sh iphonesimulator_deps iPhoneSimulator 18.2 16.2
 
-      - name: Build deps iPhoneSimulator
+      - name: Create archive from iPhone and iPhoneSimulator deps
         run: |
-          mkdir deps
-          mv iphone_deps/install deps/iphone
-          mv iphonesimulator_deps/install deps/iphonesimulator
-          tar -czvf deps.tar.gz deps
+          mkdir ios_deps
+          mv iphone_deps/install ios_deps/iphone
+          mv iphonesimulator_deps/install ios_deps/iphonesimulator
+          tar -czvf ios_deps.tar.gz ios_deps
 
       - name: Upload deps
-        if: github.event_name == 'push' && github.ref == 'ref/heads/master'
         uses: actions/upload-artifact@v4
         with:
-          name: deps
-          path: deps.tar.gz
+          name: ios_deps
+          path: ios_deps.tar.gz

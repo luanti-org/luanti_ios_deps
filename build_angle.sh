@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "This is script automate Google ANGLE build for iOS."
+echo "This is script automate ANGLE build for iOS."
 
 if [[ $# -ne 4 ]] ; then
 	echo "Usage: build_angle.sh where_angle arch osver xcodever"
