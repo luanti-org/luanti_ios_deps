@@ -20,13 +20,13 @@ jobs:
 
       - name: Build deps iPhone
         run: |
-          ./build.sh iphone_deps iPhoneOS 18.2
-          ./build_angle.sh iphone_deps iPhoneOS 18.2
+          ./build.sh iphone_deps iPhoneOS 18.2 16.2
+          ./build_angle.sh iphone_deps iPhoneOS 18.2 16.2
 
       - name: Build deps iPhoneSimulator
         run: |
-          ./build.sh iphonesimulator_deps iPhoneSimulator 18.2
-          ./build_angle.sh iphonesimulator_deps iPhoneSimulator 18.2
+          ./build.sh iphonesimulator_deps iPhoneSimulator 18.2 16.2
+          ./build_angle.sh iphonesimulator_deps iPhoneSimulator 18.2 16.2
 
       - name: Build deps iPhoneSimulator
         run: |
