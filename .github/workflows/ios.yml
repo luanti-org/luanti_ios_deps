@@ -22,11 +22,11 @@ jobs:
         run: |
           echo "REPDIR=$(pwd)" >> $GITHUB_ENV
           brew install nasm m4 autoconf automake libtool
-          source deps.sh
-          source angle.sh
 
       - name: Download/clone sources
         run: |
+          source deps.sh
+          source angle.sh
           mkdir $REPDIR/sources
           cd $REPDIR/sources
           download_ios_deps
@@ -34,6 +34,7 @@ jobs:
 
       - name: Build deps iPhone
         run: |
+          source deps.sh
           mkdir $REPDIR/iphone_deps
           cd $REPDIR/iphone_deps
           untar_ios_deps $REPDIR/sources
@@ -41,11 +42,13 @@ jobs:
 
       - name: Build ANGLE for iPhone
         run: |
+          source angle.sh
           cd $REPDIR/sources
           build_ios_angle iPhoneOS 18.2 16.2 $REPDIR/ios_deps/iPhoneOS $REPDIR/data
 
       - name: Build deps iPhoneSimulator
         run: |
+          source deps.sh
           mkdir $REPDIR/iphonesimulator_deps
           cd $REPDIR/iphonesimulator_deps
           untar_ios_deps $REPDIR/sources
@@ -53,6 +56,7 @@ jobs:
 
       - name: Build ANGLE for iPhoneSimulator
         run: |
+          source angle.sh
           cd $REPDIR/sources
           build_ios_angle iPhoneSimulator 18.2 16.2 $REPDIR/ios_deps/iPhoneSimulator $REPDIR/data
 
