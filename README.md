@@ -1,13 +1,16 @@
 # Group of scripts for build iOS deps
 
+Script `build.sh` is for manual run of build.
+
 ## Common deps
 
-Common deps libpng, gettext, freetype, gpm, libjep-turbo, joncpp, liboff, libvorbis, luajit, zstd, sdl2 and curl are builed by 
-`build.sh` script.
+Common deps libpng, gettext, freetype, gpm, libjep-turbo, joncpp, liboff,
+libvorbis, luajit, zstd, sdl2 and curl are downloaded and built
+by functions in `deps.sh` script.
 
-## Google ANGLE
+## ANGLE
 
-You can download and build Google ANGLE by running script `build_angle.sh`. This script accept one argument (`YES` or `NO`), which say, if Google ANGLE should be downloaded.
+ANGLE is cloned and build by functions in `angle.sh` script.
 
 ## License
 

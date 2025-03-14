@@ -2,11 +2,11 @@
 
 echo "This is script automate Luanti deps build process for iOS."
 
-if [[ $# -ne 4 ]] ; then
-	echo "Usage: ios_build_with_deps.sh where_deps arch osver xcodever"
+if [[ $# -ne 5 ]] ; then
+	echo "Usage: ios_build_with_deps.sh where_deps where_install arch osver step"
 	echo "  arch - iPhoneOS, iPhoneSimulator"
 	echo "  osver  - 18.2 etc."
-	echo "	xcodever - 16.2 etc"
+	echo "  step = all|download|untar|clone|build"
 	exit 1
 fi
 
@@ -14,18 +14,27 @@ RUN_DIR=$(pwd)
 SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
 
 where_deps=$1
-arch=$2
-osver=$3
-xcodever=$4
+where_install=$2
+arch=$3
+osver=$4
+step=$5
 
 if [[ "$arch" != "iPhoneOS" ]] && [[ "$arch" != "iPhoneSimulator" ]]; then
 	echo "Unsuported value of arch argument: $arch"
 	exit 1
 fi
 
-source $SCRIPT_DIR/build_deps.sh
+source $SCRIPT_DIR/deps.sh
+source $SCRIPT_DIR/angle.sh
 
 mkdir -p $where_deps
+mkdir -p $where_install
+
+where_deps=$(realpath "$where_deps")
+where_install=$(realpath "$where_install")
+
+echo "Where deps: $where_deps"
+echo "Where install: $where_install"
 
 cd $where_deps
 if [ $? -ne 0 ]; then
@@ -34,10 +43,21 @@ if [ $? -ne 0 ]; then
 fi
 DEPS_DIR=$(pwd)
 
-download_ios_deps $arch $osver
+if [[ "$step" == *"all"* ]] || [[ "$step" == *"download"* ]]; then
+	download_ios_deps
+fi
 
-untar_ios_deps $arch $osver
+if [[ "$step" == *"all"* ]] || [[ "$step" == *"untar"* ]]; then
+	untar_ios_deps $where_deps
+fi
 
-compile_ios_deps $arch $osver "$xcodever" "$SCRIPT_DIR/data"
+if [[ "$step" == *"all"* ]] || [[ "$step" == *"clone"* ]]; then
+	clone_ios_angle
+fi
+
+if [[ "$step" == *"all"* ]] || [[ "$step" == *"build"* ]]; then
+	build_ios_deps $arch $osver "" $where_install
+	build_ios_angle $arch $osver "" $where_install "$SCRIPT_DIR/data"
+fi
 
 cd $RUN_DIR

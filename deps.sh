@@ -11,9 +11,6 @@ download_ios_archive() {
 }
 
 download_ios_deps() {
-	arch=$1
-	osver=$2
-
 	echo "Downloading sources..."
 	download_ios_archive gettext.tar.gz https://ftp.gnu.org/gnu/gettext/gettext-0.22.5.tar.gz ec1705b1e969b83a9f073144ec806151db88127f5e40fe5a94cb6c8fa48996a0
 	download_ios_archive freetype.tar.xz https://downloads.sourceforge.net/project/freetype/freetype2/2.13.3/freetype-2.13.3.tar.xz 0550350666d427c74daeb85d5ac7bb353acba5f76956395995311a9c6f063289
@@ -30,22 +27,21 @@ download_ios_deps() {
 }
 
 untar_ios_deps() {
-	arch=$1
-	osver=$2
+	downdir=$1
 
 	echo "Unarchiving sources..."
-	tar -xf libpng.tar.xz
-	tar -xf gettext.tar.gz
-	tar -xf freetype.tar.xz
-	tar -xf gmp.tar.xz
-	tar -xf libjpeg-turbo.tar.gz
-	tar -xf jsoncpp.tar.gz
-	tar -xf libogg.tar.gz
-	tar -xf libvorbis.tar.gz
-	tar -xf luajit.tar.gz
-	tar -xf zstd.tar.gz
-	tar -xf sdl2.tar.gz
-	tar -xf curl.tar.gz
+	tar -xf $downdir/libpng.tar.xz
+	tar -xf $downdir/gettext.tar.gz
+	tar -xf $downdir/freetype.tar.xz
+	tar -xf $downdir/gmp.tar.xz
+	tar -xf $downdir/libjpeg-turbo.tar.gz
+	tar -xf $downdir/jsoncpp.tar.gz
+	tar -xf $downdir/libogg.tar.gz
+	tar -xf $downdir/libvorbis.tar.gz
+	tar -xf $downdir/luajit.tar.gz
+	tar -xf $downdir/zstd.tar.gz
+	tar -xf $downdir/sdl2.tar.gz
+	tar -xf $downdir/curl.tar.gz
 }
 
 check_ios_file() {
@@ -55,11 +51,11 @@ check_ios_file() {
 	fi
 }
 
-compile_ios_deps() {
+build_ios_deps() {
 	arch=$1
 	osver=$2
 	xcodever=$3
-	datadir=$4
+	installdir=$4
 	
 	# setup environment
 	xcodeapp="Xcode.app"
@@ -76,13 +72,15 @@ compile_ios_deps() {
 		echo "Requested host sysroot SDK does not found MacOSX.sdk"
 		exit 1
 	fi
-	sudo xcode-select -s /Applications/$xcodeapp/Contents/Developer
+	if [[ -n $xcodever ]]; then
+		sudo xcode-select -s /Applications/$xcodeapp/Contents/Developer
+	fi
 
-	mkdir -p install
+	mkdir -p $installdir
 
 	dir=$(pwd)
 
-	export CMAKE_PREFIX_PATH=$dir/install
+	export CMAKE_PREFIX_PATH=$installdir
 	export CPPFLAGS="-arch arm64"
 	export CC="$(xcrun --sdk iphonesimulator --find clang) -isysroot $target_sysroot"
 	export CXX="$(xcrun --sdk iphonesimulator --find clang++) -isysroot $target_sysroot"
@@ -95,33 +93,33 @@ compile_ios_deps() {
 	# libpng
 	cd libpng-*
 	echo "Configuring libpng..."
-	./configure "--prefix=$dir/install" $hostdarwin
+	./configure "--prefix=$installdir" $hostdarwin
 	echo "Building libpng..."
 	make -j$(sysctl -n hw.logicalcpu)
 	# make check
 	make install
-	check_ios_file "$dir/install/lib/libpng.a"
+	check_ios_file "$installdir/lib/libpng.a"
 	cd $dir
 
 	# freetype
 	cd freetype-*
 	echo "Configuring freetype..."
-	./configure "--prefix=${dir}/install" "LIBPNG_LIBS=-L${dir}/install/lib -lpng" \
-							"LIBPNG_CFLAGS=-I${dir}/install/include" $hostdarwin \
+	./configure "--prefix=$installdir" "LIBPNG_LIBS=-L$installdir/lib -lpng" \
+							"LIBPNG_CFLAGS=-I$installdir/include" $hostdarwin \
 							--enable-static --disable-shared \
 							--with-harfbuzz=no --with-brotli=no --with-librsvg=no \
 							"CC_BUILD=$HOST_CC"
 	echo "Building freetype..."
 	make -j$(sysctl -n hw.logicalcpu)
 	make install
-	check_ios_file "$dir/install/lib/libfreetype.a"
+	check_ios_file "$installdir/lib/libfreetype.a"
 	cd $dir
 
 	# gettext
 	cd gettext-*
 	cd gettext-runtime
 	echo "Configuring gettext..."
-	./configure "--prefix=$dir/install" --enable-static --disable-shared \
+	./configure "--prefix=$installdir" --enable-static --disable-shared \
 							--disable-silent-rules --with-included-glib \
 							--with-included-libcroco --with-included-libunistring --with-included-libxml \
 							--with-emacs --disable-java --disable-csharp --without-git --without-cvs \
@@ -129,7 +127,7 @@ compile_ios_deps() {
 	echo "Building gettext..."
 	make -j$(sysctl -n hw.logicalcpu)
 	make install
-	check_ios_file "$dir/install/lib/libintl.a"
+	check_ios_file "$installdir/lib/libintl.a"
 	cd $dir
 
 	# gmp
@@ -141,16 +139,16 @@ compile_ios_deps() {
 	if [[ "$(arch)" != "arm64" ]]; then
 		assembly=--disable-assembly
 	fi
-	#./configure "--prefix=$dir/install" --with-pic M4=/usr/local/Cellar/m4/1.4.19/bin/m4
+	#./configure "--prefix=$installdir" --with-pic M4=/usr/local/Cellar/m4/1.4.19/bin/m4
 	CC_FOR_BUILD="$HOST_CC" \
-	./configure "--prefix=$dir/install" --enable-static --disable-shared \
+	./configure "--prefix=$installdir" --enable-static --disable-shared \
 							--with-pic M4=/opt/homebrew/Cellar/m4/1.4.19/bin/m4 \
 							$hostdarwin $assembly
 	echo "Building gmp..."
 	make -j$(sysctl -n hw.logicalcpu)
 	make check
 	make install
-	check_ios_file "$dir/install/lib/libgmp.a"
+	check_ios_file "$installdir/lib/libgmp.a"
 	cd $dir
 
 	# libjpeg-turbo
@@ -160,15 +158,16 @@ compile_ios_deps() {
 	#mkdir build
 	#cd build
 	echo "Configuring libjpeg-turbo..."
-	cmake . "-DCMAKE_INSTALL_PREFIX:PATH=$dir/install" \
+	cmake . "-DCMAKE_INSTALL_PREFIX:PATH=$installdir" \
 					-DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_DEPLOYMENT_TARGET=$osver \
 					-DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_OSX_SYSROOT=$target_sysroot \
 					-DCMAKE_SYSTEM_PROCESSOR=arm64 \
-					-DCMAKE_INSTALL_NAME_DIR=$dir/install/lib
+					-DBUILD_SHARED_LIBS=OFF \
+					-DCMAKE_INSTALL_NAME_DIR=$installdir/lib
 	echo "Building libjpeg-turbo..."
 	make -j$(sysctl -n hw.logicalcpu)
-	make install "PREFIX=$dir/install"
-	check_ios_file "$dir/install/lib/libjpeg.a"
+	make install "PREFIX=$installdir"
+	check_ios_file "$installdir/lib/libjpeg.a"
 	cd $dir
 
 	# jsoncpp
@@ -178,38 +177,39 @@ compile_ios_deps() {
 	mkdir build
 	cd build
 	echo "Configuring jsoncpp..."
-	cmake .. "-DCMAKE_INSTALL_PREFIX:PATH=$dir/install" \
+	cmake .. "-DCMAKE_INSTALL_PREFIX:PATH=$installdir" \
 					-DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_DEPLOYMENT_TARGET=$osver \
 					-DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_OSX_SYSROOT=$target_sysroot \
+					-DBUILD_SHARED_LIBS=OFF \
 					-DJSONCPP_WITH_TESTS=OFF \
-					-DCMAKE_INSTALL_NAME_DIR=$dir/install/lib
+					-DCMAKE_INSTALL_NAME_DIR=$installdir/lib
 	echo "Building jsoncpp..."
 	make -j$(sysctl -n hw.logicalcpu)
 	make install
-	check_ios_file "$dir/install/lib/libjsoncpp.a"
+	check_ios_file "$installdir/lib/libjsoncpp.a"
 	cd $dir
 
 	# libogg
 	cd libogg-*
 	echo "Configuring libogg..."
-	./configure "--prefix=$dir/install" $hostdarwin_limit --enable-static --disable-shared
+	./configure "--prefix=$installdir" $hostdarwin_limit --enable-static --disable-shared
 	echo "Building libogg..."
 	make -j$(sysctl -n hw.logicalcpu)
 	make install
-	check_ios_file "$dir/install/lib/libogg.a"
+	check_ios_file "$installdir/lib/libogg.a"
 	cd $dir
 
 	# libvorbis
 	cd libvorbis-*
 	echo "Configuring libvorbis..."
 	./autogen.sh
-	OGG_LIBS="-L${dir}/install/lib -logg" OGG_CFLAGS="-I${dir}/install/include" ./configure "--prefix=$dir/install"	\
+	OGG_LIBS="-L$installdir/lib -logg" OGG_CFLAGS="-I$installdir/include" ./configure "--prefix=$installdir"	\
 				--enable-static --disable-shared \
 				$hostdarwin
 	echo "Building libvorbis..."
 	make -j$(sysctl -n hw.logicalcpu)
 	make install
-	check_ios_file "$dir/install/lib/libvorbis.a"
+	check_ios_file "$installdir/lib/libvorbis.a"
 	cd $dir
 
 	# luajit
@@ -217,7 +217,7 @@ compile_ios_deps() {
 	echo "Building LuaJIT..."
 	target_jit_flags="-arch arm64 -isysroot $target_sysroot -DLUAJIT_DISABLE_JIT"
 	host_jit_flags="-arch arm64 -isysroot $host_sysroot -DLUAJIT_DISABLE_JIT"
-	make -j$(sysctl -n hw.logicalcpu) "PREFIX=$dir/install" \
+	make -j$(sysctl -n hw.logicalcpu) "PREFIX=$installdir" \
 				"CC=$CC" \
 				"HOST_CC=$HOST_CC" \
 				"CFLAGS=$target_jit_flags" "HOST_CFLAGS=$host_jit_flags" \
@@ -225,8 +225,8 @@ compile_ios_deps() {
 	make install \
 				"CFLAGS=$jit_flags" "HOST_CFLAGS=$jit_flags" \
 				"TARGET_CFLAGS=$jit_flags" TARGET_SYS=iOS\
-				"PREFIX=$dir/install"
-	check_ios_file "$dir/install/lib/libluajit-5.1.a"
+				"PREFIX=$installdir"
+	check_ios_file "$installdir/lib/libluajit-5.1.a"
 	cd $dir
 
 	# zstd
@@ -234,14 +234,15 @@ compile_ios_deps() {
 	logdir=$(pwd)
 	cd build/cmake
 	echo "Configuring zstd..."
-	cmake . "-DCMAKE_INSTALL_PREFIX:PATH=$dir/install" \
+	cmake . "-DCMAKE_INSTALL_PREFIX:PATH=$installdir" \
 					-DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_DEPLOYMENT_TARGET=$osver \
 					-DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_OSX_SYSROOT=$target_sysroot \
-					-DCMAKE_INSTALL_NAME_DIR=$dir/install/lib
+					-DBUILD_SHARED_LIBS=OFF \
+					-DCMAKE_INSTALL_NAME_DIR=$installdir/lib
 	echo "Building zstd..."
 	make -j$(sysctl -n hw.logicalcpu)
 	make install
-	check_ios_file "$dir/install/lib/libzstd.a"
+	check_ios_file "$installdir/lib/libzstd.a"
 	cd $dir
 
 	# SDL2
@@ -251,21 +252,22 @@ compile_ios_deps() {
 	mkdir build
 	cd build
 	echo "Configuring SDL2..."
-	cmake .. "-DCMAKE_INSTALL_PREFIX:PATH=$dir/install" \
+	cmake .. "-DCMAKE_INSTALL_PREFIX:PATH=$installdir" \
 					-DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_DEPLOYMENT_TARGET=$osver \
 					-DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_OSX_SYSROOT=$target_sysroot \
+					-DBUILD_SHARED_LIBS=OFF \
 					-DSDL_OPENGL=0 -DSDL_OPENGLES=0 \
-					-DCMAKE_INSTALL_NAME_DIR=$dir/install/lib
+					-DCMAKE_INSTALL_NAME_DIR=$installdir/lib
 	echo "Building SDL2..."
 	make -j$(sysctl -n hw.logicalcpu)
 	make install
-	check_ios_file "$dir/install/lib/libSDL2.a"
+	check_ios_file "$installdir/lib/libSDL2.a"
 	cd $dir
 
 	# curl
 	cd curl-*
 	echo "Configuring curl..."
-	./configure "--prefix=$dir/install" --enable-static --disable-shared \
+	./configure "--prefix=$installdir" --enable-static --disable-shared \
 			--host=arm-apple-darwin --with-secure-transport \
 			--disable-ftp --disable-imap --disable-pop3 --disable-smtp --disable-telnet \
 			--disable-tftp --disable-ldap --disable-rtsp --disable-dict --disable-gopher --disable-smb \
@@ -278,7 +280,7 @@ compile_ios_deps() {
 	echo "Building curl..."
 	make -j$(sysctl -n hw.logicalcpu)
 	make install
-	check_ios_file "$dir/install/lib/libcurl.a"
+	check_ios_file "$installdir/lib/libcurl.a"
 	cd $dir
 }
 
