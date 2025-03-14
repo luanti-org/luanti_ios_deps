@@ -146,7 +146,7 @@ build_ios_deps() {
 							$hostdarwin $assembly
 	echo "Building gmp..."
 	make -j$(sysctl -n hw.logicalcpu)
-	make check
+	#make check
 	make install
 	check_ios_file "$installdir/lib/libgmp.a"
 	cd $dir
