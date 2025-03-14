@@ -35,7 +35,9 @@ build_ios_angle() {
 	echo "PATH=$PATH"
 	python3 scripts/bootstrap.py
 	gclient sync
-	cat $datadir/BUILD.gn >> BUILD.gn
+	if ! grep -q "libANGLE_static" BUILD.gn; then
+		cat $datadir/BUILD.gn >> BUILD.gn
+	fi
 	gn gen out
 	cp $datadir/args.gn out
 	# Update ios_sdk_version in the file
