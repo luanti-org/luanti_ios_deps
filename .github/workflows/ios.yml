@@ -20,10 +20,10 @@ jobs:
 
       - name: Prepare
         run: |
+          echo "REPDIR=$(pwd)" >> $GITHUB_ENV
           brew install nasm m4 autoconf automake libtool
           source deps.sh
           source angle.sh
-          REPDIR=${pwd}
 
       - name: Download/clone sources
         run: |
