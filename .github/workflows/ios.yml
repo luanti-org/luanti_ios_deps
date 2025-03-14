@@ -23,38 +23,38 @@ jobs:
           brew install nasm m4 autoconf automake libtool
           source deps.sh
           source angle.sh
-					REPDIR=${pwd}
+          REPDIR=${pwd}
 
       - name: Download/clone sources
         run: |
-					mkdir $REPDIR/sources
-					cd $REPDIR/sources
+          mkdir $REPDIR/sources
+          cd $REPDIR/sources
           download_ios_deps
-					clone_ios_angle
+          clone_ios_angle
 
       - name: Build deps iPhone
         run: |
-					mkdir $REPDIR/iphone_deps
-					cd $REPDIR/iphone_deps
-					untar_ios_deps $REPDIR/sources
-					build_ios_deps iPhoneOS 18.2 16.2 $REPDIR/ios_deps/iPhoneOS
+          mkdir $REPDIR/iphone_deps
+          cd $REPDIR/iphone_deps
+          untar_ios_deps $REPDIR/sources
+          build_ios_deps iPhoneOS 18.2 16.2 $REPDIR/ios_deps/iPhoneOS
 
       - name: Build ANGLE for iPhone
         run: |
-					cd $REPDIR/sources
-					build_ios_angle iPhoneOS 18.2 16.2 $REPDIR/ios_deps/iPhoneOS $REPDIR/data
+          cd $REPDIR/sources
+          build_ios_angle iPhoneOS 18.2 16.2 $REPDIR/ios_deps/iPhoneOS $REPDIR/data
 
       - name: Build deps iPhoneSimulator
         run: |
-					mkdir $REPDIR/iphonesimulator_deps
-					cd $REPDIR/iphonesimulator_deps
-					untar_ios_deps $REPDIR/sources
-					build_ios_deps iPhoneSimulator 18.2 16.2 $REPDIR/ios_deps/iPhoneSimulator
+          mkdir $REPDIR/iphonesimulator_deps
+          cd $REPDIR/iphonesimulator_deps
+          untar_ios_deps $REPDIR/sources
+          build_ios_deps iPhoneSimulator 18.2 16.2 $REPDIR/ios_deps/iPhoneSimulator
 
       - name: Build ANGLE for iPhoneSimulator
         run: |
-					cd $REPDIR/sources
-					build_ios_angle iPhoneSimulator 18.2 16.2 $REPDIR/ios_deps/iPhoneSimulator $REPDIR/data
+          cd $REPDIR/sources
+          build_ios_angle iPhoneSimulator 18.2 16.2 $REPDIR/ios_deps/iPhoneSimulator $REPDIR/data
 
       - name: Create archive from iPhone and iPhoneSimulator deps
         run: |
