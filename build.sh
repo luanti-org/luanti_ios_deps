@@ -52,7 +52,7 @@ if [[ "$step" == *"all"* ]] || [[ "$step" == *"untar"* ]]; then
 fi
 
 if [[ "$step" == *"all"* ]] || [[ "$step" == *"clone"* ]]; then
-	clone_ios_angle
+	clone_ios_angle "$SCRIPT_DIR/data"
 fi
 
 if [[ "$step" == *"all"* ]] || [[ "$step" == *"build"* ]]; then

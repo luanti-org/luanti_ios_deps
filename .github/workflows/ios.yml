@@ -30,7 +30,7 @@ jobs:
           mkdir $REPDIR/sources
           cd $REPDIR/sources
           download_ios_deps
-          clone_ios_angle
+          clone_ios_angle $REPDIR/data
 
       - name: Build deps iPhone
         run: |

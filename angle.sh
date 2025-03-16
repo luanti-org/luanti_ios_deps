@@ -1,6 +1,8 @@
 #!/bin/bash -e
 
 clone_ios_angle() {
+	datadir=$1
+
 	depot_hash="6d817fd7f4c19cde114d7cfb62fc5b313521776b"
 	#angle_hash="6b10ae3386b706624893d6f654f3af953840b3a2"
 	angle_hash="d81d29e166b6af1181f06e56c916c06676dd6ad1"
@@ -11,6 +13,20 @@ clone_ios_angle() {
 	git clone --depth 1 https://chromium.googlesource.com/angle/angle angle
 	git -C angle fetch --depth 1 origin $angle_hash
 	git -C angle checkout $angle_hash
+
+	export PATH=$PWD/depot_tools:$PATH
+
+	# angle
+	cd angle
+	python3 scripts/bootstrap.py
+	gclient sync
+	# for usable static libraries output
+	if ! grep -q "libANGLE_static" BUILD.gn; then
+		cat $datadir/BUILD.gn >> BUILD.gn
+	fi
+	sed -i '' '/compiler:thin_archive/d' build/config/BUILDCONFIG.gn
+
+	cd ..
 }
 
 build_ios_angle() {
@@ -25,21 +41,12 @@ build_ios_angle() {
 	xcodeapp="Xcode.app"
 	if [[ -n $xcodever ]]; then
 		xcodeapp="Xcode_$xcodever.app"
+		sudo xcode-select -s /Applications/$xcodeapp/Contents/Developer
 	fi
-	sudo xcode-select -s /Applications/$xcodeapp/Contents/Developer
 
 	# angle
 	cd angle
 	echo "Configuring angle..."
-	echo "PWD=$PWD"
-	echo "PATH=$PATH"
-	python3 scripts/bootstrap.py
-	gclient sync
-	# for usable static libraries output
-	if ! grep -q "libANGLE_static" BUILD.gn; then
-		cat $datadir/BUILD.gn >> BUILD.gn
-	fi
-	sed -i '' '/compiler:thin_archive/d' build/config/BUILDCONFIG.gn
 	gn gen out
 	cp $datadir/args.gn out
 	# Update ios_sdk_version in the file
