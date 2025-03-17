@@ -1,16 +1,8 @@
 name: ios_deps
 
 on:
-  push:
-    paths:
-      - '**.sh'
-      - 'data/**'
-      - '.github/workflows/ios.yml'
-  pull_request:
-    paths:
-      - '**.sh'
-      - 'data/**'
-      - '.github/workflows/ios.yml'
+  - push
+  - pull_request
 
 jobs:
   build_ios_deps:
@@ -73,9 +65,10 @@ jobs:
           path: ./ios_deps.tar.gz
 
       - name: Upload Release Asset
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ./ios_deps.tar.gz
-          asset_name: ios_deps.tar.gz
+          file: ./macos_deps.tar.gz
+          asset_name: macos_deps.tar.gz
           tag: latest
