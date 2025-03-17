@@ -71,4 +71,5 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: ./ios_deps.tar.gz
           asset_name: ios_deps.tar.gz
+          overwrite: true
           tag: latest
