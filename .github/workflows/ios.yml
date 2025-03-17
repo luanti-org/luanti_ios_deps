@@ -69,6 +69,6 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ./macos_deps.tar.gz
-          asset_name: macos_deps.tar.gz
+          file: ./ios_deps.tar.gz
+          asset_name: ios_deps.tar.gz
           tag: latest
