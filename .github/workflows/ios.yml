@@ -15,7 +15,7 @@ on:
 jobs:
   build_ios_deps:
     runs-on: macos-15
-		permissions:
+    permissions:
       contents: write
     steps:
       - uses: actions/checkout@v4
