@@ -93,7 +93,7 @@ build_ios_deps() {
 	# libpng
 	cd libpng-*
 	echo "Configuring libpng..."
-	./configure "--prefix=$installdir" $hostdarwin
+	./configure "--prefix=$installdir" $hostdarwin --enable-static --disable-shared
 	echo "Building libpng..."
 	make -j$(sysctl -n hw.logicalcpu)
 	# make check

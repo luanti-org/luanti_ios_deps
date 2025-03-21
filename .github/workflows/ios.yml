@@ -6,15 +6,21 @@ on:
 
 jobs:
   build_ios_deps:
+    strategy:
+      matrix:
+        osver: [18.2]
+        xcodever: [16.2]
     runs-on: macos-15
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@v4
 
-      - name: Prepare
+      - name: Prepare deps build for iOS ${{matrix.osver}}
         run: |
           echo "REPDIR=$(pwd)" >> $GITHUB_ENV
+          echo "osver=${{matrix.osver}}" >> $GITHUB_ENV
+          echo "xcodever=${{matrix.xcodever}}" >> $GITHUB_ENV
           brew install nasm m4 autoconf automake libtool
 
       - name: Download/clone sources
@@ -29,16 +35,16 @@ jobs:
       - name: Build deps iPhone
         run: |
           source deps.sh
-          mkdir $REPDIR/iphone_deps
-          cd $REPDIR/iphone_deps
+          mkdir $REPDIR/iphone_deps${osver}
+          cd $REPDIR/iphone_deps${osver}
           untar_ios_deps $REPDIR/sources
-          build_ios_deps iPhoneOS 18.2 16.2 $REPDIR/ios_deps/iPhoneOS
+          build_ios_deps iPhoneOS "$osver" "$xcodever" $REPDIR/ios_deps${osver}/iPhoneOS
 
       - name: Build ANGLE for iPhone
         run: |
           source angle.sh
           cd $REPDIR/sources
-          build_ios_angle iPhoneOS 18.2 16.2 $REPDIR/ios_deps/iPhoneOS $REPDIR/data
+          build_ios_angle iPhoneOS "$osver" "xcodever" $REPDIR/ios_deps${osver}/iPhoneOS $REPDIR/data
 
       - name: Build deps iPhoneSimulator
         run: |
@@ -46,30 +52,30 @@ jobs:
           mkdir $REPDIR/iphonesimulator_deps
           cd $REPDIR/iphonesimulator_deps
           untar_ios_deps $REPDIR/sources
-          build_ios_deps iPhoneSimulator 18.2 16.2 $REPDIR/ios_deps/iPhoneSimulator
+          build_ios_deps iPhoneSimulator 18.2 16.2 $REPDIR/ios_deps${osver}/iPhoneSimulator
 
       - name: Build ANGLE for iPhoneSimulator
         run: |
           source angle.sh
           cd $REPDIR/sources
-          build_ios_angle iPhoneSimulator 18.2 16.2 $REPDIR/ios_deps/iPhoneSimulator $REPDIR/data
+          build_ios_angle iPhoneSimulator 18.2 16.2 $REPDIR/ios_deps${osver}/iPhoneSimulator $REPDIR/data
 
       - name: Create archive from iPhone and iPhoneSimulator deps
         run: |
-          tar -czvf ios_deps.tar.gz ios_deps
+          tar -czvf ios_deps${osver}.tar.gz ios_deps${osver}
 
       - name: Upload deps
         uses: actions/upload-artifact@v4
         with:
-          name: ios_deps
-          path: ./ios_deps.tar.gz
+          name: ios${{matrix.osver}}_deps
+          path: ./ios${{matrix.osver}}_deps.tar.gz
 
       - name: Upload Release Asset
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ./ios_deps.tar.gz
-          asset_name: ios_deps.tar.gz
+          file: ./ios${{matrix.osver}}_deps.tar.gz
+          asset_name: ios${{matrix.osver}}_deps.tar.gz
           overwrite: true
           tag: latest
