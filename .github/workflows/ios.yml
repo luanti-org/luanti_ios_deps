@@ -44,7 +44,7 @@ jobs:
         run: |
           source angle.sh
           cd $REPDIR/sources
-          build_ios_angle iPhoneOS "$osver" "xcodever" $REPDIR/ios_deps${osver}/iPhoneOS $REPDIR/data
+          build_ios_angle iPhoneOS "$osver" "$xcodever" $REPDIR/ios_deps${osver}/iPhoneOS $REPDIR/data
 
       - name: Build deps iPhoneSimulator
         run: |
@@ -52,13 +52,13 @@ jobs:
           mkdir $REPDIR/iphonesimulator_deps
           cd $REPDIR/iphonesimulator_deps
           untar_ios_deps $REPDIR/sources
-          build_ios_deps iPhoneSimulator 18.2 16.2 $REPDIR/ios_deps${osver}/iPhoneSimulator
+          build_ios_deps iPhoneSimulator "$osver" "$xcodever" $REPDIR/ios_deps${osver}/iPhoneSimulator
 
       - name: Build ANGLE for iPhoneSimulator
         run: |
           source angle.sh
           cd $REPDIR/sources
-          build_ios_angle iPhoneSimulator 18.2 16.2 $REPDIR/ios_deps${osver}/iPhoneSimulator $REPDIR/data
+          build_ios_angle iPhoneSimulator "$osver" "$xcodever" $REPDIR/ios_deps${osver}/iPhoneSimulator $REPDIR/data
 
       - name: Create archive from iPhone and iPhoneSimulator deps
         run: |
