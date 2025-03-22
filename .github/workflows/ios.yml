@@ -35,34 +35,34 @@ jobs:
       - name: Build deps iPhone
         run: |
           source deps.sh
-          mkdir $REPDIR/iphone_deps${osver}
-          cd $REPDIR/iphone_deps${osver}
+          mkdir $REPDIR/iphone${osver}_deps
+          cd $REPDIR/iphone${osver}_deps
           untar_ios_deps $REPDIR/sources
-          build_ios_deps iPhoneOS "$osver" "$xcodever" $REPDIR/ios_deps${osver}/iPhoneOS
+          build_ios_deps iPhoneOS "$osver" "$xcodever" $REPDIR/ios${osver}_deps/iPhoneOS
 
       - name: Build ANGLE for iPhone
         run: |
           source angle.sh
           cd $REPDIR/sources
-          build_ios_angle iPhoneOS "$osver" "$xcodever" $REPDIR/ios_deps${osver}/iPhoneOS $REPDIR/data
+          build_ios_angle iPhoneOS "$osver" "$xcodever" $REPDIR/ios${osver}_deps/iPhoneOS $REPDIR/data
 
       - name: Build deps iPhoneSimulator
         run: |
           source deps.sh
-          mkdir $REPDIR/iphonesimulator_deps
-          cd $REPDIR/iphonesimulator_deps
+          mkdir $REPDIR/iphonesimulator${osver}_deps
+          cd $REPDIR/iphonesimulator${osver}_deps
           untar_ios_deps $REPDIR/sources
-          build_ios_deps iPhoneSimulator "$osver" "$xcodever" $REPDIR/ios_deps${osver}/iPhoneSimulator
+          build_ios_deps iPhoneSimulator "$osver" "$xcodever" $REPDIR/ios${osver}_deps/iPhoneSimulator
 
       - name: Build ANGLE for iPhoneSimulator
         run: |
           source angle.sh
           cd $REPDIR/sources
-          build_ios_angle iPhoneSimulator "$osver" "$xcodever" $REPDIR/ios_deps${osver}/iPhoneSimulator $REPDIR/data
+          build_ios_angle iPhoneSimulator "$osver" "$xcodever" $REPDIR/ios${osver}_deps/iPhoneSimulator $REPDIR/data
 
       - name: Create archive from iPhone and iPhoneSimulator deps
         run: |
-          tar -czvf ios_deps${osver}.tar.gz ios_deps${osver}
+          tar -czvf ios${osver}_deps.tar.gz ios${osver}_deps
 
       - name: Upload deps
         uses: actions/upload-artifact@v4
