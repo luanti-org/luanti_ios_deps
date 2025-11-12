@@ -62,7 +62,10 @@ jobs:
 
       - name: Create archive from iPhone and iPhoneSimulator deps
         run: |
+          TARDIR=$(pwd)
+          cd ${INSTALLDIR}
           tar -czvf ios${osver}_deps.tar.gz ios${osver}_deps
+          cd ${TARDIR}
 
       - name: Upload deps
         uses: actions/upload-artifact@v4

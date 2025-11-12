@@ -139,10 +139,10 @@ build_ios_deps() {
 	if [[ "$(arch)" != "arm64" ]]; then
 		assembly=--disable-assembly
 	fi
-	#./configure "--prefix=$installdir" --with-pic M4=/usr/local/Cellar/m4/1.4.19/bin/m4
+	#./configure "--prefix=$installdir" --with-pic M4=/usr/local/Cellar/m4/1.4.20/bin/m4
 	CC_FOR_BUILD="$HOST_CC" \
 	./configure "--prefix=$installdir" --enable-static --disable-shared \
-							--with-pic M4=/opt/homebrew/Cellar/m4/1.4.19/bin/m4 \
+							--with-pic M4=/opt/homebrew/Cellar/m4/1.4.20/bin/m4 \
 							$hostdarwin $assembly
 	echo "Building gmp..."
 	make -j$(sysctl -n hw.logicalcpu)
