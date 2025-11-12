@@ -19,6 +19,7 @@ jobs:
       - name: Prepare deps build for iOS ${{matrix.osver}}
         run: |
           echo "REPDIR=$(pwd)" >> $GITHUB_ENV
+          echo "INSTALLDIR=/Users/Shared" >> $GITHUB_ENV
           echo "osver=${{matrix.osver}}" >> $GITHUB_ENV
           echo "xcodever=${{matrix.xcodever}}" >> $GITHUB_ENV
           brew install nasm m4 autoconf automake libtool
@@ -38,13 +39,13 @@ jobs:
           mkdir $REPDIR/iphone${osver}_deps
           cd $REPDIR/iphone${osver}_deps
           untar_ios_deps $REPDIR/sources
-          build_ios_deps iPhoneOS "$osver" "$xcodever" $REPDIR/ios${osver}_deps/iPhoneOS
+          build_ios_deps iPhoneOS "$osver" "$xcodever" $INSTALLDIR/ios${osver}_deps/iPhoneOS
 
       - name: Build ANGLE for iPhone
         run: |
           source angle.sh
           cd $REPDIR/sources
-          build_ios_angle iPhoneOS "$osver" "$xcodever" $REPDIR/ios${osver}_deps/iPhoneOS $REPDIR/data
+          build_ios_angle iPhoneOS "$osver" "$xcodever" $INSTALLDIR/ios${osver}_deps/iPhoneOS $REPDIR/data
 
       - name: Build deps iPhoneSimulator
         run: |
@@ -52,19 +53,19 @@ jobs:
           mkdir $REPDIR/iphonesimulator${osver}_deps
           cd $REPDIR/iphonesimulator${osver}_deps
           untar_ios_deps $REPDIR/sources
-          build_ios_deps iPhoneSimulator "$osver" "$xcodever" $REPDIR/ios${osver}_deps/iPhoneSimulator
+          build_ios_deps iPhoneSimulator "$osver" "$xcodever" $INSTALLDIR/ios${osver}_deps/iPhoneSimulator
 
       - name: Build ANGLE for iPhoneSimulator
         run: |
           source angle.sh
           cd $REPDIR/sources
-          build_ios_angle iPhoneSimulator "$osver" "$xcodever" $REPDIR/ios${osver}_deps/iPhoneSimulator $REPDIR/data
+          build_ios_angle iPhoneSimulator "$osver" "$xcodever" $INSTALLDIR/ios${osver}_deps/iPhoneSimulator $REPDIR/data
 
       - name: Create archive from iPhone and iPhoneSimulator deps
         run: |
           TARDIR=$(pwd)
           cd ${INSTALLDIR}
-          tar -czvf ios${osver}_deps.tar.gz ios${osver}_deps
+          tar -czvf ${TARDIR}/ios${osver}_deps.tar.gz ios${osver}_deps
           cd ${TARDIR}
 
       - name: Upload deps
